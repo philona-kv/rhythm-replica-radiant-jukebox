@@ -5,7 +5,8 @@ import {
   Play, 
   Pause, 
   Shuffle,
-  Repeat
+  Repeat,
+  ListMusic
 } from "lucide-react";
 import { Slider } from "@/components/ui/slider";
 import { usePlayer } from "@/contexts/PlayerContext";
