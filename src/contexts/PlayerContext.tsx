@@ -1,3 +1,4 @@
+// src/contexts/PlayerContext.tsx
 import { createContext, useContext, useState, ReactNode } from 'react';
 
 interface Track {
@@ -22,54 +23,44 @@ interface PlayerContextType {
 
 const PlayerContext = createContext<PlayerContextType | undefined>(undefined);
 
-// Update audio file paths to match the actual files in the public directory
-const audioFiles = [
-  "/sample-music.mp3",
-  "/SoundHelix-Song-2.mp3",
-  "/SoundHelix-Song-3.mp3",
-  "/SoundHelix-Song-4.mp3"
+// Default audio files
+const audioFiles: Track[] = [
+  {
+    title: "Sample Music 1",
+    artist: "Artist 1",
+    albumArt: "https://picsum.photos/200/300?random=1",
+    audioUrl: "/sample-music.mp3"
+  },
+  {
+    title: "Sample Music 2",
+    artist: "Artist 2",
+    albumArt: "https://picsum.photos/200/300?random=2",
+    audioUrl: "/SoundHelix-Song-2.mp3"
+  },
+  {
+    title: "Sample Music 3",
+    artist: "Artist 3",
+    albumArt: "https://picsum.photos/200/300?random=3",
+    audioUrl: "/SoundHelix-Song-3.mp3"
+  },
+  {
+    title: "Sample Music 4",
+    artist: "Artist 4",
+    albumArt: "https://picsum.photos/200/300?random=4",
+    audioUrl: "/SoundHelix-Song-4.mp3"
+  }
 ];
-
-// Default album art in case the random one fails
-const defaultAlbumArt = "https://picsum.photos/200";
-
-const generateRandomTrack = (): Track => {
-  const randomIndex = Math.floor(Math.random() * audioFiles.length);
-  return {
-    title: `Random Song ${Math.floor(Math.random() * 1000)}`,
-    artist: "Various Artists",
-    albumArt: `https://picsum.photos/id/${Math.floor(Math.random() * 1000)}/200`,
-    audioUrl: audioFiles[randomIndex]
-  };
-};
 
 export const PlayerProvider = ({ children }: { children: ReactNode }) => {
   const [isPlaying, setIsPlaying] = useState(false);
   const [currentTrack, setCurrentTrack] = useState<Track | null>(null);
-  const [queue, setQueue] = useState<Track[]>([]);
-  const [currentIndex, setCurrentIndex] = useState(-1);
+  const [queue, setQueue] = useState<Track[]>(audioFiles); // Initialize with default tracks
+  const [currentIndex, setCurrentIndex] = useState(0);
 
   const playTrack = (track: Track) => {
-    try {
-      // If the track is already in the queue, find its index
-      const existingIndex = queue.findIndex(t => t.audioUrl === track.audioUrl);
-      
-      if (existingIndex !== -1) {
-        // If track exists in queue, play it from there
-        setCurrentIndex(existingIndex);
-        setCurrentTrack(queue[existingIndex]);
-      } else {
-        // If track is new, add it to queue and play it
-        const newQueue = [...queue, track];
-        setQueue(newQueue);
-        setCurrentIndex(newQueue.length - 1);
-        setCurrentTrack(track);
-      }
-      setIsPlaying(true);
-    } catch (error) {
-      console.error("Error playing track:", error);
-      setIsPlaying(false);
-    }
+    setCurrentTrack(track);
+    setCurrentIndex(queue.findIndex(t => t.audioUrl === track.audioUrl));
+    setIsPlaying(true);
   };
 
   const pauseTrack = () => {
@@ -81,58 +72,29 @@ export const PlayerProvider = ({ children }: { children: ReactNode }) => {
   };
 
   const playNext = () => {
-    try {
-      if (queue.length === 0) return;
-      
-      let nextIndex;
-      if (currentIndex === -1) {
-        // If no track is currently playing, start from the beginning
-        nextIndex = 0;
-      } else if (currentIndex < queue.length - 1) {
-        // Play next track in queue
-        nextIndex = currentIndex + 1;
-      } else {
-        // If we're at the end of the queue, loop back to the beginning
-        nextIndex = 0;
-      }
-
-      setCurrentIndex(nextIndex);
-      setCurrentTrack(queue[nextIndex]);
-      setIsPlaying(true);
-    } catch (error) {
-      console.error("Error playing next track:", error);
-      setIsPlaying(false);
-    }
+    if (queue.length === 0) return; // Prevent errors if queue is empty
+    setCurrentIndex((prevIndex) => {
+      const nextIndex = (prevIndex + 1) % queue.length; // Loop back to start
+      const nextTrack = queue[nextIndex];
+      setCurrentTrack(nextTrack);
+      return nextIndex;
+    });
+    setIsPlaying(true); // Start playing the next track
   };
 
   const playPrevious = () => {
-    try {
-      if (queue.length === 0) return;
-      
-      let prevIndex;
-      if (currentIndex <= 0) {
-        // If we're at the beginning or no track is playing, go to the end
-        prevIndex = queue.length - 1;
-      } else {
-        // Play previous track in queue
-        prevIndex = currentIndex - 1;
-      }
-
-      setCurrentIndex(prevIndex);
-      setCurrentTrack(queue[prevIndex]);
-      setIsPlaying(true);
-    } catch (error) {
-      console.error("Error playing previous track:", error);
-      setIsPlaying(false);
-    }
+    if (queue.length === 0) return; // Prevent errors if queue is empty
+    setCurrentIndex((prevIndex) => {
+      const prevIndexValue = (prevIndex - 1 + queue.length) % queue.length; // Loop to end
+      const prevTrack = queue[prevIndexValue];
+      setCurrentTrack(prevTrack);
+      return prevIndexValue;
+    });
+    setIsPlaying(true); // Start playing the previous track
   };
 
   const addToQueue = (track: Track) => {
-    try {
-      setQueue(prev => [...prev, track]);
-    } catch (error) {
-      console.error("Error adding track to queue:", error);
-    }
+    setQueue(prev => [...prev, track]);
   };
 
   return (

@@ -38,11 +38,10 @@ const MusicPlayer = () => {
   useEffect(() => {
     if (audioRef.current && currentTrack) {
       setIsLoading(true);
-
-      // Reset audio element
-      audioRef.current.currentTime = 0;
+      
+      // Reset progress only when a new track is loaded
       setProgress(0);
-
+      
       const loadAudio = async () => {
         try {
           if (isPlaying) {
@@ -130,10 +129,10 @@ const MusicPlayer = () => {
 
       <div className="w-1/3">
         <div className="flex justify-center items-center gap-8">
-          <button className="text-white opacity-70 hover:opacity-100 transition-opacity">
-            <Shuffle size={16} />
+        <button className="text-white opacity-70 hover:opacity-100 transition-opacity" onClick={playPrevious}>
+            <Shuffle size={18} />
           </button>
-          <button className="text-white opacity-70 hover:opacity-100 transition-opacity">
+          <button className="text-white opacity-70 hover:opacity-100 transition-opacity" onClick={playPrevious}>
             <SkipBack size={18} />
           </button>
           <button
@@ -146,10 +145,10 @@ const MusicPlayer = () => {
               <Play size={24} className="text-black" />
             )}
           </button>
-          <button className="text-white opacity-70 hover:opacity-100 transition-opacity">
+          <button className="text-white opacity-70 hover:opacity-100 transition-opacity" onClick={playNext}>
             <SkipForward size={18} />
           </button>
-          <button className="text-white opacity-70 hover:opacity-100 transition-opacity">
+          <button className="text-white opacity-70 hover:opacity-100 transition-opacity" onClick={playPrevious}>
             <Repeat size={16} />
           </button>
         </div>
