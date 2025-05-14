@@ -1,7 +1,7 @@
-
 import { useState, useEffect } from "react";
 import { useParams } from "react-router-dom";
 import { ClockIcon, HeartIcon, MoreHorizontalIcon, PlayIcon } from "lucide-react";
+import { usePlayer } from "@/contexts/PlayerContext";
 
 interface Song {
   title: string;
@@ -9,6 +9,8 @@ interface Song {
   album: string;
   duration: string;
   addedAt: string;
+  audioUrl: string;
+  albumArt: string;
 }
 
 const PlaylistView = () => {
@@ -16,6 +18,7 @@ const PlaylistView = () => {
   const [playlist, setPlaylist] = useState<any>(null);
   const [songs, setSongs] = useState<Song[]>([]);
   const [isFollowing, setIsFollowing] = useState(false);
+  const { playTrack } = usePlayer();
   
   useEffect(() => {
     // Mock playlist data
@@ -29,9 +32,18 @@ const PlaylistView = () => {
       duration: "1 hr 22 min"
     });
     
-    // Mock song data
+    // Mock song data with local audio files
     setSongs(generateMockSongs(25));
   }, [id]);
+
+  const handlePlaySong = (song: Song) => {
+    playTrack({
+      title: song.title,
+      artist: song.artist,
+      albumArt: song.albumArt,
+      audioUrl: song.audioUrl
+    });
+  };
   
   if (!playlist) {
     return <div className="p-8">Loading...</div>;
@@ -63,7 +75,10 @@ const PlaylistView = () => {
       
       {/* Playlist controls */}
       <div className="flex items-center gap-6 p-4">
-        <button className="w-14 h-14 bg-spotify rounded-full flex items-center justify-center shadow-lg hover:scale-105 transition-transform">
+        <button 
+          className="w-14 h-14 bg-spotify rounded-full flex items-center justify-center shadow-lg hover:scale-105 transition-transform"
+          onClick={() => songs.length > 0 && handlePlaySong(songs[0])}
+        >
           <PlayIcon size={28} fill="black" className="ml-1" />
         </button>
         
@@ -95,6 +110,7 @@ const PlaylistView = () => {
           <div 
             key={index} 
             className="grid grid-cols-[16px_4fr_3fr_2fr_minmax(120px,1fr)] gap-4 hover:bg-spotify-hover rounded-md py-3 px-4 text-sm group cursor-pointer"
+            onClick={() => handlePlaySong(song)}
           >
             <div className="flex items-center justify-center text-spotify-text group-hover:hidden">
               {index + 1}
@@ -118,20 +134,29 @@ const PlaylistView = () => {
   );
 };
 
-// Generate mock songs
+// Generate mock songs with local audio files
 const generateMockSongs = (count: number): Song[] => {
   const songs: Song[] = [];
   const artists = ["Drake", "Kendrick Lamar", "J. Cole", "The Weeknd", "Post Malone", "Ariana Grande", "Taylor Swift"];
   const albums = ["Certified Lover Boy", "DAMN.", "The Off-Season", "After Hours", "Hollywood's Bleeding", "Positions", "Evermore"];
+  const audioFiles = [
+    "/sample-music.mp3",
+    "/SoundHelix-Song-2.mp3",
+    "/SoundHelix-Song-3.mp3",
+    "/SoundHelix-Song-4.mp3"
+  ];
   
   for (let i = 0; i < count; i++) {
     const artistIndex = Math.floor(Math.random() * artists.length);
+    const audioIndex = Math.floor(Math.random() * audioFiles.length);
     songs.push({
       title: `Song ${i + 1}`,
       artist: artists[artistIndex],
       album: albums[artistIndex],
       duration: `${Math.floor(Math.random() * 4) + 1}:${Math.floor(Math.random() * 60).toString().padStart(2, '0')}`,
       addedAt: `${Math.floor(Math.random() * 30) + 1} days ago`,
+      audioUrl: audioFiles[audioIndex],
+      albumArt: `https://picsum.photos/id/${237 + i}/200`
     });
   }
   
