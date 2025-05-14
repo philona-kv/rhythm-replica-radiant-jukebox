@@ -6,15 +6,12 @@ import {
   Play, 
   Pause, 
   Shuffle,
-  Volume2, 
   Repeat
 } from "lucide-react";
-import { Slider } from "@/components/ui/slider";
 import { Progress } from "@/components/ui/progress";
 
 const MusicPlayer = () => {
   const [isPlaying, setIsPlaying] = useState(false);
-  const [volume, setVolume] = useState(70);
   const [progress, setProgress] = useState(30);
   
   const togglePlay = () => setIsPlaying(!isPlaying);
@@ -26,30 +23,30 @@ const MusicPlayer = () => {
         <span className="text-xs text-spotify-text mr-2">0:12</span>
         <Progress 
           value={progress} 
-          className="h-1 flex-grow" 
+          className="h-1 flex-grow bg-gray-800" 
         />
         <span className="text-xs text-spotify-text ml-2">4:00</span>
       </div>
       
       {/* Player controls */}
-      <div className="flex justify-center items-center gap-6">
+      <div className="flex justify-center items-center gap-8">
         <button className="text-white opacity-70 hover:opacity-100 transition-opacity">
-          <Shuffle size={18} />
+          <Shuffle size={16} />
         </button>
         <button className="text-white opacity-70 hover:opacity-100 transition-opacity">
-          <SkipBack size={24} />
+          <SkipBack size={18} />
         </button>
         <button 
-          className="bg-white rounded-full w-10 h-10 flex items-center justify-center hover:scale-105 transition-transform"
+          className="bg-white rounded-full w-8 h-8 flex items-center justify-center hover:scale-105 transition-transform"
           onClick={togglePlay}
         >
-          {isPlaying ? <Pause size={20} className="text-black" /> : <Play size={20} className="text-black ml-0.5" />}
+          {isPlaying ? <Pause size={16} className="text-black" /> : <Play size={16} className="text-black ml-0.5" />}
         </button>
         <button className="text-white opacity-70 hover:opacity-100 transition-opacity">
-          <SkipForward size={24} />
+          <SkipForward size={18} />
         </button>
         <button className="text-white opacity-70 hover:opacity-100 transition-opacity">
-          <Repeat size={18} />
+          <Repeat size={16} />
         </button>
       </div>
     </div>
