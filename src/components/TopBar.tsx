@@ -5,18 +5,18 @@ import { Link } from "react-router-dom";
 
 const TopBar = () => {
   return (
-    <div className="h-20 bg-spotify-dark/95 sticky top-0 z-10 w-full flex justify-center py-4">
-      {/* Container to control max width and centering */}
-      <div className="w-full max-w-7xl px-6 flex items-center justify-between">
+    <div className="h-20 bg-spotify-dark sticky top-0 z-50 w-full flex justify-center py-4">
+      {/* Container for whole top bar */}
+      <div className="w-full flex items-center px-6">
         {/* Left section - Logo */}
-        <div className="flex items-center">
-          <Link to="/" className="flex items-center mr-6">
+        <div className="flex items-center ml-1">
+          <Link to="/" className="flex items-center">
             <img src="/logo.jpg" alt="Spookify Logo" className="w-10 h-10" />
           </Link>
         </div>
 
         {/* Middle section - Home button and Search bar */}
-        <div className="flex-1 max-w-3xl flex items-center gap-3">
+        <div className="flex-1 flex items-center justify-center gap-3 mx-2">
           {/* Home button */}
           <Link to="/">
             <Button
@@ -29,7 +29,7 @@ const TopBar = () => {
           </Link>
 
           {/* Search bar */}
-          <div className="relative flex-1">
+          <div className="relative flex-1 max-w-md">
             <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
               <SearchIcon className="text-gray-400" size={18} />
             </div>
@@ -42,7 +42,7 @@ const TopBar = () => {
         </div>
 
         {/* Right section - Install app, notification, and user image */}
-        <div className="flex items-center gap-3">
+        <div className="flex items-center gap-2 mr-1">
           <Button
             variant="outline"
             className="bg-black/70 text-white border border-gray-700 hover:bg-black/80 flex items-center gap-1 text-sm px-3 py-1 h-10 rounded-full"

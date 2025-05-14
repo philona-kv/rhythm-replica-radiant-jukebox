@@ -11,16 +11,18 @@ const MainLayout = () => {
   }, []);
 
   return (
-    <div className="min-h-screen flex flex-col bg-black overflow-hidden">
-      <TopBar />
+    <div className="h-screen flex flex-col bg-black overflow-hidden">
+      <div className="flex-shrink-0">
+        <TopBar />
+      </div>
 
-      <div className="flex justify-center w-full px-2 flex-grow pb-20">
-        <div className="w-full max-w-[98%] flex gap-2 my-2">
-          <div className="bg-spotify-dark rounded-lg overflow-hidden min-w-[280px] max-h-[calc(100vh-140px)]">
+      <div className="flex w-full px-2 flex-grow overflow-hidden">
+        <div className="w-full max-w-[98%] mx-auto flex gap-2 my-2">
+          <div className="bg-spotify-dark rounded-lg overflow-hidden min-w-[280px] h-[calc(100vh-148px)]">
             <Sidebar />
           </div>
 
-          <div className="flex-grow bg-spotify-dark rounded-lg overflow-hidden max-h-[calc(100vh-140px)]">
+          <div className="flex-grow bg-spotify-dark rounded-lg overflow-hidden h-[calc(100vh-148px)]">
             <main className="h-full overflow-y-auto custom-scrollbar">
               <Outlet />
             </main>
@@ -28,7 +30,9 @@ const MainLayout = () => {
         </div>
       </div>
 
-      <MusicPlayer />
+      <div className="flex-shrink-0">
+        <MusicPlayer />
+      </div>
     </div>
   );
 };

@@ -1,24 +1,24 @@
-import { useRef, useEffect, useState } from "react";
-import { 
-  SkipBack, 
-  SkipForward, 
-  Play, 
-  Pause, 
-  Volume2, 
-  ListMusic, 
-  Maximize2 
-} from "lucide-react";
 import { Slider } from "@/components/ui/slider";
 import { usePlayer } from "@/contexts/PlayerContext";
+import {
+  ListMusic,
+  Maximize2,
+  Pause,
+  Play,
+  SkipBack,
+  SkipForward,
+  Volume2,
+} from "lucide-react";
+import { useEffect, useRef, useState } from "react";
 
 const MusicPlayer = () => {
-  const { 
-    isPlaying, 
-    currentTrack, 
-    pauseTrack, 
+  const {
+    isPlaying,
+    currentTrack,
+    pauseTrack,
     resumeTrack,
     playNext,
-    playPrevious
+    playPrevious,
   } = usePlayer();
   const [volume, setVolume] = useState(70);
   const [progress, setProgress] = useState(0);
@@ -36,11 +36,11 @@ const MusicPlayer = () => {
   useEffect(() => {
     if (audioRef.current && currentTrack) {
       setIsLoading(true);
-      
+
       // Reset audio element
       audioRef.current.currentTime = 0;
       setProgress(0);
-      
+
       const loadAudio = async () => {
         try {
           if (isPlaying) {
@@ -73,7 +73,8 @@ const MusicPlayer = () => {
 
   const handleTimeUpdate = () => {
     if (audioRef.current) {
-      const progress = (audioRef.current.currentTime / audioRef.current.duration) * 100;
+      const progress =
+        (audioRef.current.currentTime / audioRef.current.duration) * 100;
       setProgress(progress);
     }
   };
@@ -89,13 +90,13 @@ const MusicPlayer = () => {
   const formatTime = (seconds: number) => {
     const mins = Math.floor(seconds / 60);
     const secs = Math.floor(seconds % 60);
-    return `${mins}:${secs.toString().padStart(2, '0')}`;
+    return `${mins}:${secs.toString().padStart(2, "0")}`;
   };
 
   if (!currentTrack) return null;
 
   return (
-    <div className="h-20 bg-spotify-light border-t border-gray-800 fixed bottom-0 left-0 right-0 flex items-center px-4">
+    <div className="h-20 bg-spotify-light border-t border-gray-800 flex items-center px-4">
       <audio
         ref={audioRef}
         src={currentTrack.audioUrl}
@@ -109,11 +110,11 @@ const MusicPlayer = () => {
         onCanPlay={() => setIsLoading(false)}
         preload="auto"
       />
-      
+
       <div className="w-1/3 flex items-center gap-4">
-        <img 
-          src={currentTrack.albumArt} 
-          alt="Album cover" 
+        <img
+          src={currentTrack.albumArt}
+          alt="Album cover"
           className="w-14 h-14 rounded"
           onError={(e) => {
             e.currentTarget.src = "https://picsum.photos/200";
@@ -124,17 +125,17 @@ const MusicPlayer = () => {
           <p className="text-xs text-spotify-text">{currentTrack.artist}</p>
         </div>
       </div>
-      
+
       <div className="w-1/3">
         <div className="flex justify-center items-center gap-4 mb-2">
-          <button 
+          <button
             className="player-button"
             onClick={playPrevious}
             disabled={isLoading}
           >
             <SkipBack size={20} />
           </button>
-          <button 
+          <button
             className="bg-white rounded-full w-8 h-8 flex items-center justify-center hover:scale-105 transition-transform disabled:opacity-50"
             onClick={togglePlay}
             disabled={isLoading}
@@ -147,7 +148,7 @@ const MusicPlayer = () => {
               <Play size={18} className="text-black ml-0.5" />
             )}
           </button>
-          <button 
+          <button
             className="player-button"
             onClick={playNext}
             disabled={isLoading}
@@ -155,10 +156,12 @@ const MusicPlayer = () => {
             <SkipForward size={20} />
           </button>
         </div>
-        
+
         <div className="flex items-center gap-2">
           <span className="text-xs text-spotify-text">
-            {audioRef.current ? formatTime(audioRef.current.currentTime) : "0:00"}
+            {audioRef.current
+              ? formatTime(audioRef.current.currentTime)
+              : "0:00"}
           </span>
           <Slider
             value={[progress]}
@@ -173,7 +176,7 @@ const MusicPlayer = () => {
           </span>
         </div>
       </div>
-      
+
       <div className="w-1/3 flex justify-end items-center gap-3">
         <button className="player-button" disabled={isLoading}>
           <ListMusic size={18} />

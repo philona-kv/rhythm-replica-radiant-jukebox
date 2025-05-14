@@ -70,8 +70,13 @@
   * {
     @apply border-border;
   }
+  html,
   body {
-    @apply bg-black text-white;
+    @apply bg-black text-white h-full overflow-hidden;
+  }
+
+  #root {
+    @apply h-full overflow-hidden;
   }
 
   /* Custom scrollbar styles */
