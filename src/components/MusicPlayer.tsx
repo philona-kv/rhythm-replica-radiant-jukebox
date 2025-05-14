@@ -1,4 +1,4 @@
-import { useRef, useEffect, useState } from "react";
+import { useState } from "react";
 import { 
   SkipBack, 
   SkipForward, 
@@ -103,10 +103,7 @@ const MusicPlayer = () => {
           alt="Album cover" 
           className="w-14 h-14 rounded"
         />
-        <div>
-          <h4 className="text-sm font-semibold">{currentTrack.title}</h4>
-          <p className="text-xs text-spotify-text">{currentTrack.artist}</p>
-        </div>
+        <span className="text-xs text-spotify-text ml-2">4:00</span>
       </div>
       
       <div className="w-1/3">
