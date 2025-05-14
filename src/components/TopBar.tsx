@@ -1,18 +1,48 @@
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { useSearch } from "@/contexts/SearchContext";
-import { BellIcon, HomeIcon, SearchIcon, XIcon } from "lucide-react";
+import {
+  BellIcon,
+  HomeIcon,
+  LoaderIcon,
+  SearchIcon,
+  XIcon,
+} from "lucide-react";
+import { useEffect, useRef } from "react";
 import { Link, useLocation } from "react-router-dom";
 
 const TopBar = () => {
-  const { query, performSearch, clearSearch } = useSearch();
+  const { query, setQuery, performSearch, clearSearch, isLoading, error } =
+    useSearch();
   const location = useLocation();
   const isSearchPage = location.pathname === "/search";
+  const searchTimeoutRef = useRef<NodeJS.Timeout | null>(null);
 
   const handleSearch = (e: React.ChangeEvent<HTMLInputElement>) => {
     const value = e.target.value;
-    performSearch(value);
+
+    // Update the input value immediately for responsive UI
+    setQuery(value);
+
+    // Clear any existing timeout
+    if (searchTimeoutRef.current) {
+      clearTimeout(searchTimeoutRef.current);
+    }
+
+    // Add debounce to avoid too many API calls while typing
+    searchTimeoutRef.current = setTimeout(() => {
+      performSearch(value);
+    }, 1000); // Reduced to 1 second instead of 5 for better UX
   };
+
+  // Clean up timeout on unmount
+  useEffect(() => {
+    return () => {
+      if (searchTimeoutRef.current) {
+        clearTimeout(searchTimeoutRef.current);
+      }
+    };
+  }, []);
 
   return (
     <div className="h-20 bg-spotify-dark sticky top-0 z-50 w-full flex justify-center py-4">
@@ -43,19 +73,31 @@ const TopBar = () => {
           {/* Search bar */}
           <div className="relative flex-1 max-w-md">
             <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-              <SearchIcon className="text-gray-400" size={18} />
+              {isLoading ? (
+                <LoaderIcon className="text-gray-400 animate-spin" size={18} />
+              ) : (
+                <SearchIcon className="text-gray-400" size={18} />
+              )}
             </div>
             <Input
               type="search"
-              placeholder="What do you want to play?"
-              className="bg-gray-800/80 border-none h-10 pl-10 pr-4 text-white w-full rounded-full focus-visible:ring-0 focus-visible:ring-offset-0"
+              placeholder={
+                error
+                  ? "Error searching. Try again."
+                  : "What do you want to play?"
+              }
+              className={`bg-gray-800/80 border-none h-10 pl-10 pr-4 text-white w-full rounded-full focus-visible:ring-0 focus-visible:ring-offset-0 ${
+                error ? "border-red-500" : ""
+              }`}
               value={query}
               onChange={handleSearch}
+              disabled={isLoading}
             />
             {query && (
               <button
                 className="absolute inset-y-0 right-0 pr-3 flex items-center"
                 onClick={clearSearch}
+                disabled={isLoading}
               >
                 <XIcon size={18} className="text-gray-400 hover:text-white" />
               </button>

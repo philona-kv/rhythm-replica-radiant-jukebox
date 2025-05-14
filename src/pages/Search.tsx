@@ -1,9 +1,11 @@
-import PlaylistCard from "@/components/PlaylistCard";
+import { usePlayer } from "@/contexts/PlayerContext";
 import { useSearch } from "@/contexts/SearchContext";
+import { LoaderIcon, MusicIcon, PlayIcon } from "lucide-react";
 import { useEffect, useState } from "react";
 
 const Search = () => {
-  const { query, results, performSearch } = useSearch();
+  const { query, results, isLoading, error } = useSearch();
+  const { playTrack } = usePlayer();
   const [categories, setCategories] = useState<any[]>([]);
 
   useEffect(() => {
@@ -72,25 +74,100 @@ const Search = () => {
     ]);
   }, []);
 
+  const handlePlaySong = (song: any) => {
+    playTrack({
+      title: song.title,
+      artist: song.artist,
+      albumArt: song.coverImage,
+      audioUrl: song.audioUrl,
+    });
+  };
+
+  // Format duration from seconds to MM:SS
+  const formatDuration = (seconds: number) => {
+    const mins = Math.floor(seconds / 60);
+    const secs = Math.floor(seconds % 60);
+    return `${mins}:${secs.toString().padStart(2, "0")}`;
+  };
+
   return (
     <div className="px-6 py-6 pb-28">
       {query.trim() !== "" ? (
         // Search results
         <div>
           <h2 className="text-2xl font-bold mb-4">Top results for "{query}"</h2>
-          {results.length > 0 ? (
-            <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-6">
-              {results.map((item, index) => (
-                <PlaylistCard
-                  key={index}
-                  title={item.title}
-                  description={item.description}
-                  imageUrl={item.imageUrl}
-                />
-              ))}
+
+          {isLoading ? (
+            <div className="flex items-center justify-center py-10">
+              <LoaderIcon
+                className="animate-spin text-spotify-green mr-2"
+                size={24}
+              />
+              <span>Searching...</span>
+            </div>
+          ) : error ? (
+            <div className="text-red-500 py-4">{error}</div>
+          ) : results.length > 0 ? (
+            <div className="w-full">
+              <table className="w-full border-collapse">
+                <thead>
+                  <tr className="text-sm text-spotify-text border-b border-gray-700">
+                    <th className="text-left p-2 pl-0 w-12">#</th>
+                    <th className="text-left p-2">Title</th>
+                    <th className="text-left p-2">Album</th>
+                    <th className="text-left p-2">Duration</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {results.map((song, index) => (
+                    <tr
+                      key={song.id}
+                      className="group hover:bg-white/10 rounded-md cursor-pointer"
+                      onClick={() => handlePlaySong(song)}
+                    >
+                      <td className="p-2 pl-0 w-12 relative">
+                        <span className="group-hover:hidden">{index + 1}</span>
+                        <button className="absolute top-1/2 left-0 transform -translate-y-1/2 hidden group-hover:flex items-center justify-center">
+                          <PlayIcon className="text-white" size={16} />
+                        </button>
+                      </td>
+                      <td className="p-2">
+                        <div className="flex items-center">
+                          <img
+                            src={song.coverImage || "https://picsum.photos/100"}
+                            alt={song.title}
+                            className="w-10 h-10 mr-3"
+                            onError={(e) => {
+                              e.currentTarget.src = "https://picsum.photos/100";
+                            }}
+                          />
+                          <div>
+                            <div className="font-medium">{song.title}</div>
+                            <div className="text-sm text-spotify-text">
+                              {song.artist}
+                            </div>
+                          </div>
+                        </div>
+                      </td>
+                      <td className="p-2 text-spotify-text">{song.album}</td>
+                      <td className="p-2 text-spotify-text">
+                        {formatDuration(song.duration)}
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
             </div>
           ) : (
-            <p className="text-spotify-text">No results found for "{query}"</p>
+            <div className="flex flex-col items-center justify-center py-10 text-center">
+              <MusicIcon size={48} className="text-spotify-text mb-4" />
+              <p className="text-spotify-text">
+                No results found for "{query}"
+              </p>
+              <p className="text-sm text-spotify-text mt-2">
+                Try different keywords or check your spelling
+              </p>
+            </div>
           )}
         </div>
       ) : (
