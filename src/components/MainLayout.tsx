@@ -16,12 +16,12 @@ const MainLayout = () => {
 
       <div className="flex justify-center w-full px-2 flex-grow pb-20">
         <div className="w-full max-w-[98%] flex gap-2 my-2">
-          <div className="bg-spotify-dark rounded-lg overflow-hidden min-w-[280px]">
+          <div className="bg-spotify-dark rounded-lg overflow-hidden min-w-[280px] max-h-[calc(100vh-140px)]">
             <Sidebar />
           </div>
 
-          <div className="flex-grow bg-spotify-dark rounded-lg overflow-hidden">
-            <main className="overflow-y-auto relative p-6">
+          <div className="flex-grow bg-spotify-dark rounded-lg overflow-hidden max-h-[calc(100vh-140px)]">
+            <main className="h-full overflow-y-auto custom-scrollbar">
               <Outlet />
             </main>
           </div>
