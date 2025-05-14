@@ -1,11 +1,12 @@
+// src/components/MusicPlayer.tsx
 import { useRef, useEffect, useState } from "react";
 import { 
   SkipBack, 
   SkipForward, 
   Play, 
   Pause, 
-  Volume2, 
-  ListMusic, 
+  Shuffle, 
+  Repeat, 
   Maximize2 
 } from "lucide-react";
 import { Slider } from "@/components/ui/slider";
@@ -126,33 +127,24 @@ const MusicPlayer = () => {
       </div>
       
       <div className="w-1/3">
-        <div className="flex justify-center items-center gap-4 mb-2">
-          <button 
-            className="player-button"
-            onClick={playPrevious}
-            disabled={isLoading}
-          >
-            <SkipBack size={20} />
+        <div className="flex justify-center items-center gap-8">
+          <button className="text-white opacity-70 hover:opacity-100 transition-opacity">
+            <Shuffle size={16} />
+          </button>
+          <button className="text-white opacity-70 hover:opacity-100 transition-opacity">
+            <SkipBack size={18} />
           </button>
           <button 
-            className="bg-white rounded-full w-8 h-8 flex items-center justify-center hover:scale-105 transition-transform disabled:opacity-50"
+            className="bg-white rounded-full w-12 h-12 flex items-center justify-center hover:scale-105 transition-transform"
             onClick={togglePlay}
-            disabled={isLoading}
           >
-            {isLoading ? (
-              <div className="w-4 h-4 border-2 border-black border-t-transparent rounded-full animate-spin" />
-            ) : isPlaying ? (
-              <Pause size={18} className="text-black" />
-            ) : (
-              <Play size={18} className="text-black ml-0.5" />
-            )}
+            {isPlaying ? <Pause size={24} className="text-black" /> : <Play size={24} className="text-black" />}
           </button>
-          <button 
-            className="player-button"
-            onClick={playNext}
-            disabled={isLoading}
-          >
-            <SkipForward size={20} />
+          <button className="text-white opacity-70 hover:opacity-100 transition-opacity">
+            <SkipForward size={18} />
+          </button>
+          <button className="text-white opacity-70 hover:opacity-100 transition-opacity">
+            <Repeat size={16} />
           </button>
         </div>
         
@@ -176,10 +168,9 @@ const MusicPlayer = () => {
       
       <div className="w-1/3 flex justify-end items-center gap-3">
         <button className="player-button" disabled={isLoading}>
-          <ListMusic size={18} />
+          <Maximize2 size={18} className="text-spotify-text" />
         </button>
         <div className="flex items-center gap-1 w-32">
-          <Volume2 size={18} className="text-spotify-text" />
           <Slider
             value={[volume]}
             max={100}
@@ -189,9 +180,6 @@ const MusicPlayer = () => {
             disabled={isLoading}
           />
         </div>
-        <button className="player-button" disabled={isLoading}>
-          <Maximize2 size={18} />
-        </button>
       </div>
     </div>
   );
