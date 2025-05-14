@@ -4,35 +4,53 @@ import {
   SkipForward, 
   Play, 
   Pause, 
-  Shuffle,
-  Repeat,
-  ListMusic
+  Volume2, 
+  ListMusic, 
+  Maximize2 
 } from "lucide-react";
 import { Slider } from "@/components/ui/slider";
 import { usePlayer } from "@/contexts/PlayerContext";
-import { Progress } from "@/components/ui/progress";
 
 const MusicPlayer = () => {
-  const { isPlaying, currentTrack, pauseTrack, resumeTrack } = usePlayer();
+  const { 
+    isPlaying, 
+    currentTrack, 
+    pauseTrack, 
+    resumeTrack,
+    playNext,
+    playPrevious
+  } = usePlayer();
   const [volume, setVolume] = useState(70);
   const [progress, setProgress] = useState(0);
   const audioRef = useRef<HTMLAudioElement>(null);
 
+  // Handle volume changes
   useEffect(() => {
     if (audioRef.current) {
       audioRef.current.volume = volume / 100;
     }
   }, [volume]);
 
+  // Handle play/pause state and track changes
   useEffect(() => {
-    if (audioRef.current) {
+    if (audioRef.current && currentTrack) {
+      // Reset audio element
+      audioRef.current.currentTime = 0;
+      setProgress(0);
+      
       if (isPlaying) {
-        audioRef.current.play();
+        const playPromise = audioRef.current.play();
+        if (playPromise !== undefined) {
+          playPromise.catch(error => {
+            console.error("Error playing audio:", error);
+            pauseTrack();
+          });
+        }
       } else {
         audioRef.current.pause();
       }
     }
-  }, [isPlaying]);
+  }, [isPlaying, currentTrack]);
 
   const togglePlay = () => {
     if (isPlaying) {
@@ -57,6 +75,12 @@ const MusicPlayer = () => {
     }
   };
 
+  const formatTime = (seconds: number) => {
+    const mins = Math.floor(seconds / 60);
+    const secs = Math.floor(seconds % 60);
+    return `${mins}:${secs.toString().padStart(2, '0')}`;
+  };
+
   if (!currentTrack) return null;
 
   return (
@@ -65,7 +89,12 @@ const MusicPlayer = () => {
         ref={audioRef}
         src={currentTrack.audioUrl}
         onTimeUpdate={handleTimeUpdate}
-        onEnded={pauseTrack}
+        onEnded={playNext}
+        onError={(e) => {
+          console.error("Audio error:", e);
+          pauseTrack();
+        }}
+        preload="auto"
       />
       
       <div className="w-1/3 flex items-center gap-4">
@@ -82,7 +111,10 @@ const MusicPlayer = () => {
       
       <div className="w-1/3">
         <div className="flex justify-center items-center gap-4 mb-2">
-          <button className="player-button">
+          <button 
+            className="player-button"
+            onClick={playPrevious}
+          >
             <SkipBack size={20} />
           </button>
           <button 
@@ -91,14 +123,17 @@ const MusicPlayer = () => {
           >
             {isPlaying ? <Pause size={18} className="text-black" /> : <Play size={18} className="text-black ml-0.5" />}
           </button>
-          <button className="player-button">
+          <button 
+            className="player-button"
+            onClick={playNext}
+          >
             <SkipForward size={20} />
           </button>
         </div>
         
         <div className="flex items-center gap-2">
           <span className="text-xs text-spotify-text">
-            {audioRef.current ? Math.floor(audioRef.current.currentTime) : 0}
+            {audioRef.current ? formatTime(audioRef.current.currentTime) : "0:00"}
           </span>
           <Slider
             value={[progress]}
@@ -108,7 +143,7 @@ const MusicPlayer = () => {
             onValueChange={handleSliderChange}
           />
           <span className="text-xs text-spotify-text">
-            {audioRef.current ? Math.floor(audioRef.current.duration) : 0}
+            {audioRef.current ? formatTime(audioRef.current.duration) : "0:00"}
           </span>
         </div>
       </div>
@@ -117,20 +152,18 @@ const MusicPlayer = () => {
         <button className="player-button">
           <ListMusic size={18} />
         </button>
-        <button className="text-white opacity-70 hover:opacity-100 transition-opacity">
-          <SkipBack size={18} />
-        </button>
-        <button 
-          className="bg-black border border-white rounded-full w-8 h-8 flex items-center justify-center hover:scale-105 transition-transform"
-          onClick={togglePlay}
-        >
-          {isPlaying ? <Pause size={16} className="text-white" /> : <Play size={16} className="text-white ml-0.5" />}
-        </button>
-        <button className="text-white opacity-70 hover:opacity-100 transition-opacity">
-          <SkipForward size={18} />
-        </button>
-        <button className="text-white opacity-70 hover:opacity-100 transition-opacity">
-          <Repeat size={16} />
+        <div className="flex items-center gap-1 w-32">
+          <Volume2 size={18} className="text-spotify-text" />
+          <Slider
+            value={[volume]}
+            max={100}
+            step={1}
+            className="w-full h-1"
+            onValueChange={(values) => setVolume(values[0])}
+          />
+        </div>
+        <button className="player-button">
+          <Maximize2 size={18} />
         </button>
       </div>
     </div>
