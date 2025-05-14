@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useRef, useEffect, useState } from "react";
 import { 
   SkipBack, 
   SkipForward, 
@@ -22,6 +22,7 @@ const MusicPlayer = () => {
   } = usePlayer();
   const [volume, setVolume] = useState(70);
   const [progress, setProgress] = useState(0);
+  const [isLoading, setIsLoading] = useState(false);
   const audioRef = useRef<HTMLAudioElement>(null);
 
   // Handle volume changes
@@ -34,21 +35,31 @@ const MusicPlayer = () => {
   // Handle play/pause state and track changes
   useEffect(() => {
     if (audioRef.current && currentTrack) {
+      setIsLoading(true);
+      
       // Reset audio element
       audioRef.current.currentTime = 0;
       setProgress(0);
       
-      if (isPlaying) {
-        const playPromise = audioRef.current.play();
-        if (playPromise !== undefined) {
-          playPromise.catch(error => {
-            console.error("Error playing audio:", error);
-            pauseTrack();
-          });
+      const loadAudio = async () => {
+        try {
+          if (isPlaying) {
+            const playPromise = audioRef.current?.play();
+            if (playPromise !== undefined) {
+              await playPromise;
+            }
+          } else {
+            audioRef.current?.pause();
+          }
+        } catch (error) {
+          console.error("Error playing audio:", error);
+          pauseTrack();
+        } finally {
+          setIsLoading(false);
         }
-      } else {
-        audioRef.current.pause();
-      }
+      };
+
+      loadAudio();
     }
   }, [isPlaying, currentTrack]);
 
@@ -94,6 +105,8 @@ const MusicPlayer = () => {
           console.error("Audio error:", e);
           pauseTrack();
         }}
+        onLoadStart={() => setIsLoading(true)}
+        onCanPlay={() => setIsLoading(false)}
         preload="auto"
       />
       
@@ -102,8 +115,14 @@ const MusicPlayer = () => {
           src={currentTrack.albumArt} 
           alt="Album cover" 
           className="w-14 h-14 rounded"
+          onError={(e) => {
+            e.currentTarget.src = "https://picsum.photos/200";
+          }}
         />
-        <span className="text-xs text-spotify-text ml-2">4:00</span>
+        <div>
+          <h4 className="text-sm font-semibold">{currentTrack.title}</h4>
+          <p className="text-xs text-spotify-text">{currentTrack.artist}</p>
+        </div>
       </div>
       
       <div className="w-1/3">
@@ -111,18 +130,27 @@ const MusicPlayer = () => {
           <button 
             className="player-button"
             onClick={playPrevious}
+            disabled={isLoading}
           >
             <SkipBack size={20} />
           </button>
           <button 
-            className="bg-white rounded-full w-8 h-8 flex items-center justify-center hover:scale-105 transition-transform"
+            className="bg-white rounded-full w-8 h-8 flex items-center justify-center hover:scale-105 transition-transform disabled:opacity-50"
             onClick={togglePlay}
+            disabled={isLoading}
           >
-            {isPlaying ? <Pause size={18} className="text-black" /> : <Play size={18} className="text-black ml-0.5" />}
+            {isLoading ? (
+              <div className="w-4 h-4 border-2 border-black border-t-transparent rounded-full animate-spin" />
+            ) : isPlaying ? (
+              <Pause size={18} className="text-black" />
+            ) : (
+              <Play size={18} className="text-black ml-0.5" />
+            )}
           </button>
           <button 
             className="player-button"
             onClick={playNext}
+            disabled={isLoading}
           >
             <SkipForward size={20} />
           </button>
@@ -138,6 +166,7 @@ const MusicPlayer = () => {
             step={1}
             className="w-full h-1"
             onValueChange={handleSliderChange}
+            disabled={isLoading}
           />
           <span className="text-xs text-spotify-text">
             {audioRef.current ? formatTime(audioRef.current.duration) : "0:00"}
@@ -146,7 +175,7 @@ const MusicPlayer = () => {
       </div>
       
       <div className="w-1/3 flex justify-end items-center gap-3">
-        <button className="player-button">
+        <button className="player-button" disabled={isLoading}>
           <ListMusic size={18} />
         </button>
         <div className="flex items-center gap-1 w-32">
@@ -157,9 +186,10 @@ const MusicPlayer = () => {
             step={1}
             className="w-full h-1"
             onValueChange={(values) => setVolume(values[0])}
+            disabled={isLoading}
           />
         </div>
-        <button className="player-button">
+        <button className="player-button" disabled={isLoading}>
           <Maximize2 size={18} />
         </button>
       </div>
