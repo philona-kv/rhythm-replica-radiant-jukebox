@@ -37,10 +37,10 @@ const MusicPlayer = () => {
           <SkipBack size={18} />
         </button>
         <button 
-          className="bg-white rounded-full w-8 h-8 flex items-center justify-center hover:scale-105 transition-transform"
+          className="bg-black border border-white rounded-full w-8 h-8 flex items-center justify-center hover:scale-105 transition-transform"
           onClick={togglePlay}
         >
-          {isPlaying ? <Pause size={16} className="text-black" /> : <Play size={16} className="text-black ml-0.5" />}
+          {isPlaying ? <Pause size={16} className="text-white" /> : <Play size={16} className="text-white ml-0.5" />}
         </button>
         <button className="text-white opacity-70 hover:opacity-100 transition-opacity">
           <SkipForward size={18} />
