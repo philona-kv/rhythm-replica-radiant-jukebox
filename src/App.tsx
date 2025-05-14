@@ -11,6 +11,7 @@ import Library from "./pages/Library";
 import NotFound from "./pages/NotFound";
 import PlaylistView from "./pages/PlaylistView";
 import Search from "./pages/Search";
+import SongDetails from "./pages/SongDetails";
 
 const queryClient = new QueryClient();
 
@@ -35,6 +36,7 @@ const App = () => (
                 <Route path="search" element={<Search />} />
                 <Route path="library" element={<Library />} />
                 <Route path="playlist/:id" element={<PlaylistView />} />
+                <Route path="song/:id" element={<SongDetails />} />
               </Route>
               <Route path="*" element={<NotFound />} />
             </Routes>
