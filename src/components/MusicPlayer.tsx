@@ -4,12 +4,13 @@ import {
   SkipForward, 
   Play, 
   Pause, 
+  Shuffle,
   Volume2, 
-  ListMusic, 
-  Maximize2 
+  Repeat
 } from "lucide-react";
 import { Slider } from "@/components/ui/slider";
 import { usePlayer } from "@/contexts/PlayerContext";
+import { Progress } from "@/components/ui/progress";
 
 const MusicPlayer = () => {
   const { isPlaying, currentTrack, pauseTrack, resumeTrack } = usePlayer();
@@ -116,18 +117,20 @@ const MusicPlayer = () => {
         <button className="player-button">
           <ListMusic size={18} />
         </button>
-        <div className="flex items-center gap-1 w-32">
-          <Volume2 size={18} className="text-spotify-text" />
-          <Slider
-            value={[volume]}
-            max={100}
-            step={1}
-            className="w-full h-1"
-            onValueChange={(values) => setVolume(values[0])}
-          />
-        </div>
-        <button className="player-button">
-          <Maximize2 size={18} />
+        <button className="text-white opacity-70 hover:opacity-100 transition-opacity">
+          <SkipBack size={24} />
+        </button>
+        <button 
+          className="bg-white rounded-full w-10 h-10 flex items-center justify-center hover:scale-105 transition-transform"
+          onClick={togglePlay}
+        >
+          {isPlaying ? <Pause size={20} className="text-black" /> : <Play size={20} className="text-black ml-0.5" />}
+        </button>
+        <button className="text-white opacity-70 hover:opacity-100 transition-opacity">
+          <SkipForward size={24} />
+        </button>
+        <button className="text-white opacity-70 hover:opacity-100 transition-opacity">
+          <Repeat size={18} />
         </button>
       </div>
     </div>
