@@ -1,9 +1,19 @@
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { BellIcon, HomeIcon, SearchIcon } from "lucide-react";
-import { Link } from "react-router-dom";
+import { useSearch } from "@/contexts/SearchContext";
+import { BellIcon, HomeIcon, SearchIcon, XIcon } from "lucide-react";
+import { Link, useLocation } from "react-router-dom";
 
 const TopBar = () => {
+  const { query, performSearch, clearSearch } = useSearch();
+  const location = useLocation();
+  const isSearchPage = location.pathname === "/search";
+
+  const handleSearch = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const value = e.target.value;
+    performSearch(value);
+  };
+
   return (
     <div className="h-20 bg-spotify-dark sticky top-0 z-50 w-full flex justify-center py-4">
       {/* Container for whole top bar */}
@@ -22,7 +32,9 @@ const TopBar = () => {
             <Button
               variant="ghost"
               size="icon"
-              className="rounded-full bg-black/70 w-10 h-10 border border-gray-700"
+              className={`rounded-full w-10 h-10 border border-gray-700 ${
+                location.pathname === "/" ? "bg-white/10" : "bg-black/70"
+              }`}
             >
               <HomeIcon size={20} className="text-white" />
             </Button>
@@ -37,7 +49,17 @@ const TopBar = () => {
               type="search"
               placeholder="What do you want to play?"
               className="bg-gray-800/80 border-none h-10 pl-10 pr-4 text-white w-full rounded-full focus-visible:ring-0 focus-visible:ring-offset-0"
+              value={query}
+              onChange={handleSearch}
             />
+            {query && (
+              <button
+                className="absolute inset-y-0 right-0 pr-3 flex items-center"
+                onClick={clearSearch}
+              >
+                <XIcon size={18} className="text-gray-400 hover:text-white" />
+              </button>
+            )}
           </div>
         </div>
 
@@ -79,7 +101,7 @@ const TopBar = () => {
             className="rounded-full bg-black/70 w-10 h-10 overflow-hidden border border-gray-700"
           >
             <img
-              src="https://placekitten.com/100/100"
+              src="/person.jpg"
               alt="User profile"
               className="w-full h-full object-cover"
             />

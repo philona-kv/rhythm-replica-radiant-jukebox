@@ -5,6 +5,7 @@ import { PlayerProvider } from "@/contexts/PlayerContext";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Route, Routes } from "react-router-dom";
 import MainLayout from "./components/MainLayout";
+import { SearchProvider } from "./contexts/SearchContext";
 import Home from "./pages/Home";
 import Library from "./pages/Library";
 import NotFound from "./pages/NotFound";
@@ -22,7 +23,14 @@ const App = () => (
           <Sonner />
           <BrowserRouter>
             <Routes>
-              <Route path="/" element={<MainLayout />}>
+              <Route
+                path="/"
+                element={
+                  <SearchProvider>
+                    <MainLayout />
+                  </SearchProvider>
+                }
+              >
                 <Route index element={<Home />} />
                 <Route path="search" element={<Search />} />
                 <Route path="library" element={<Library />} />
